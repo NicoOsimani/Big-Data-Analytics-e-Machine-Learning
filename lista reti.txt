@@ -1,0 +1,14 @@
+https://github.com/WuJie1010/Facial-Expression-Recognition.Pytorch		pythorch >= 0.2.0 	python 2.7
+https://github.com/BCV-Uniandes/AUNets						pythorch 0.3.1		python 2.7
+https://github.com/donydchen/FMPN-FER						pytorch>=0.4.1,visdom	python>=3.6
+https://github.com/phamquiluan/ResidualMaskingNetwork				pythorch>=1.3		python 3.6
+
+https://github.com/thoughtworksarts/EmoPy					tensorflow 1.13		python 3.6	
+https://github.com/amineHorseman/facial-expression-recognition-using-cnn	tensorflow
+
+https://github.com/justinshenk/fer						tensorflow>=1.7.0	python 3
+https://github.com/ShawDa/facial-expression-recognition				tensorflow-keras	python 3.5
+https://github.com/piyush2896/Facial-Expression-Recognition-Challenge		tensorflow,keras
+https://github.com/rishabhjainps/Facial-Expression-Recognition			keras			python 2.7
+
+https://github.com/general515/Facial_Expression_Recognition_Using_GCN       pytotrch 1.1.0 
