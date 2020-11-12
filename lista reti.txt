@@ -1,7 +1,8 @@
 https://github.com/BCV-Uniandes/AUNets					pythorch 0.3.1		python 2.7
 https://github.com/donydchen/FMPN-FER						pytorch>=0.4.1-visdom	python>=3.6
+https://github.com/anhtuan85/Facial-expression-recognition
 
-
+arrivati a pag 7
 
 
 https://github.com/general515/Facial_Expression_Recognition_Using_GCN        pytotrch 1.1.0
