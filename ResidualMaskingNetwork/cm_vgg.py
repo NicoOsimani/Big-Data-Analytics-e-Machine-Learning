@@ -22,8 +22,13 @@ from matplotlib import rc
 # rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 ## for Palatino and other serif fonts use:
 # rc('font',**{'family':'serif','serif':['Palatino']})
-rc("font", **{"family": "serif", "serif": ["Computer Modern Roman"]})
-rc("text", usetex=True)
+#rc("font", **{"family": "serif", "serif": ["Computer Modern Roman"]})
+#rc("text", usetex=True)
+
+
+checkpoint_name = "vgg19_rot30_2019Dec01_14.01"
+
+dataset_name = "fer2013" #fer2013
 
 seed = 1234
 random.seed(seed)
@@ -37,6 +42,7 @@ torch.backends.cudnn.benchmark = False
 
 from models import resatt18
 from utils.datasets.fer2013dataset import fer2013
+from utils.datsets.mydatasetdataset import mydataset
 from utils.generals import make_batch
 from tqdm import tqdm
 
@@ -58,6 +64,7 @@ def plot_confusion_matrix(
         print("Confusion matrix, without normalization")
     print(cm)
 
+    fig = plt.figure(figsize=(6, 6), dpi=80)
     plt.imshow(cm, interpolation="nearest", cmap=cmap)
     plt.title(title, fontsize=12)
     plt.colorbar()
@@ -79,13 +86,13 @@ def plot_confusion_matrix(
     plt.ylabel("True label", fontsize=12)
     plt.xlabel("Predicted label", fontsize=12)
     plt.tight_layout()
-
-
-checkpoint_name = "vgg19_rot30_2019Dec01_14.01"
+    fig.savefig("./saved/cm/cm_{}.png".format(checkpoint_name))
+    plt.show()
+    plt.close(fig)
 
 
 def main():
-    with open("./configs/fer2013_config.json") as f:
+    with open("./configs/" + dataset_name + "_config.json") as f:
         configs = json.load(f)
 
     acc = 0.0
@@ -104,9 +111,13 @@ def main():
     all_target = []
     all_output = []
 
-    test_set = fer2013("test", configs, tta=True, tta_size=8)
-    # test_set = fer2013('test', configs, tta=False, tta_size=0)
+    if dataset_name == "fer2013":
+    	test_set = fer2013("test", configs, tta=True, tta_size=10)
+    	# test_set = fer2013('test', configs, tta=False, tta_size=0)
+    else:
+        test_set = mydataset("test", configs, tta=True, tta_size=10)
 
+    print("Calc acc on private test with tta..")
     with torch.no_grad():
         for idx in tqdm(range(len(test_set)), total=len(test_set), leave=False):
             images, targets = test_set[idx]
@@ -128,8 +139,8 @@ def main():
             all_target.append(targets)
             all_output.append(outputs)
 
-    # acc = 100. * correct / total
-    # print("Accuracy {:.03f}".format(acc))
+    acc = 100. * correct / total
+    print("Accuracy on private test with tta: {:.3f}".format(acc))
 
     all_target = np.array(all_target)
     all_output = np.array(all_output)
@@ -148,8 +159,8 @@ def main():
 
     # plt.show()
     # plt.savefig('cm_{}.png'.format(checkpoint_name))
-    plt.savefig("./saved/cm/cm_{}.pdf".format(checkpoint_name))
-    plt.close()
+    #plt.savefig("./saved/cm/cm_{}.pdf".format(checkpoint_name))
+    #plt.close()
 
 
 if __name__ == "__main__":
