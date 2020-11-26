@@ -12,7 +12,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
 from natsort import natsorted
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, classification_report
 from torch.utils.data import Dataset, DataLoader
 from torchvision.transforms import transforms
 
@@ -162,6 +162,9 @@ def main():
         title="Resnet152",
     )
 
+    class_report = classification_report(all_target, all_output, target_names=class_names)
+    print("Classification report")
+    print(class_report)
     # plt.show()
     # plt.savefig('cm_{}.png'.format(checkpoint_name))
     #plt.savefig("./saved/cm/cm_{}.pdf".format(checkpoint_name))
