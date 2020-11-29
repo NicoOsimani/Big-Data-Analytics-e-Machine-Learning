@@ -1,6 +1,6 @@
 {
-	"data_path": "saved/data/CK+",
-	"image_size": 63,
+	"data_path": "saved/data/mydataset/fold_1",
+	"image_size": 224,
 	"in_channels": 3,
 	"num_classes": 7,
 	"arch": "alexnet",
@@ -18,5 +18,5 @@
 	"steplr": 50,
 	"log_dir": "saved/logs",
 	"checkpoint_dir": "saved/checkpoints",
-	"model_name": "mydataset"
+	"model_name": "mydataset_fold_1"
 }

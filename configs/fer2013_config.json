@@ -1,5 +1,5 @@
 {
-	"data_path": "saved/data/fer2013",
+	"data_path": "saved/data/fer2013/fold_1",
 	"image_size": 224,
 	"in_channels": 3,
 	"num_classes": 7,
@@ -18,5 +18,5 @@
 	"steplr": 50,
 	"log_dir": "saved/logs",
 	"checkpoint_dir": "saved/checkpoints",
-	"model_name": "fer2013"
+	"model_name": "fer2013_fold_1"
 }

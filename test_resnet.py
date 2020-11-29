@@ -3,6 +3,7 @@ import glob
 import json
 import random
 import itertools
+import csv
 
 import imgaug
 import cv2
@@ -146,7 +147,12 @@ def main():
 
     acc = 100. * correct / total
     print("Accuracy on private test with tta: {:.3f}".format(acc))
-
+    out_path = "./saved/results/accuracy/{}.csv".format(checkpoint_name)
+    out_file = open(out_path, "w", newline='')
+    csv_writer = csv.writer(out_file, delimiter=",")
+    acc_row = [acc]
+    csv_writer.writerow(acc_row)
+    
     all_target = np.array(all_target)
     all_output = np.array(all_output)
 
