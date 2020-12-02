@@ -4,7 +4,7 @@ import random
 import warnings
 
 # todo: set dataset name
-dataset_name = "fer2013"
+dataset_name = "fer2013" #fer2013
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
 

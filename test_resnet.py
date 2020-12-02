@@ -3,7 +3,6 @@ import glob
 import json
 import random
 import itertools
-import csv
 
 import imgaug
 import cv2
@@ -26,10 +25,11 @@ from matplotlib import rc
 #rc("font", **{"family": "serif", "serif": ["Computer Modern Roman"]})
 #rc("text", usetex=True)
 
-
-checkpoint_name = "resnet152__n_2020Nov15_17.35"
-
+# todo: set names
+check_name = "resnet50_fer2013_fold_{}_2020Nov15_21.44" #checkpoint names - resnet50_fer2013_fold_{}_2020Nov15_21.44
 dataset_name = "fer2013" #fer2013
+test_name = "test"
+class_names = ["Angry", "Disgust", "Fear", "Happy", "Sad", "Surprise", "Neutral"]
 
 seed = 1234
 random.seed(seed)
@@ -47,11 +47,15 @@ from utils.datasets.mydatasetdataset import mydataset
 from utils.generals import make_batch
 from tqdm import tqdm
 
-class_names = ["Angry", "Disgust", "Fear", "Happy", "Sad", "Surprise", "Neutral"]
+check_test_name = check_name + "_" + test_name
 
+def Log(data, name):
+    file = open(name, "a")
+    file.write(str(data))
+    file.close()
 
 def plot_confusion_matrix(
-    cm, classes, normalize=False, title="Confusion matrix", cmap=plt.cm.Blues
+    cm, classes, normalize=False, title="Confusion matrix", cmap=plt.cm.Blues, log_name="log_name", check_log_name="check_log_name"
 ):
     """
     This function prints and plots the confusion matrix.
@@ -63,8 +67,18 @@ def plot_confusion_matrix(
         print("Normalized confusion matrix")
     else:
         print("Confusion matrix, without normalization")
-    print(cm)
-
+    row = []
+    Log("Confusion matrix\n", "./saved/results/{}.txt".format(log_name))
+    for i in range(0, len(cm)):
+        if row != []:
+            print(row)
+            Log(row, "./saved/results/{}.txt".format(log_name))
+            Log("\n", "./saved/results/{}.txt".format(log_name))
+        row = []
+        for j in range(0, len(cm[0])):
+            row.append(round(cm[i][j], 2))
+    print(row)
+    Log(row, "./saved/results/{}.txt".format(log_name))
     fig = plt.figure(figsize=(6, 6), dpi=80)
     plt.imshow(cm, interpolation="nearest", cmap=cmap)
     plt.title(title, fontsize=12)
@@ -87,7 +101,7 @@ def plot_confusion_matrix(
     plt.ylabel("True label", fontsize=12)
     plt.xlabel("Predicted label", fontsize=12)
     plt.tight_layout()
-    fig.savefig("./saved/cm/cm_{}.png".format(checkpoint_name))
+    fig.savefig("./saved/cm/cm_{}.png".format(check_log_name))
     plt.show()
     plt.close(fig)
 
@@ -95,86 +109,98 @@ def plot_confusion_matrix(
 def main():
     with open("./configs/" + dataset_name + "_config.json") as f:
         configs = json.load(f)
+    data_path = configs["data_path"]
 
-    acc = 0.0
-    state = torch.load("./saved/checkpoints/{}".format(checkpoint_name))
+    for i in range(0, configs["k-fold"]):
+        checkpoint_name = check_name.format(i + 1)
 
-    from models import basenet, densenet121, resnet18, resmasking_dropout1, resnet152
+        check_log_name = checkpoint_name + "_" + test_name
 
-    model = resnet152
+        configs["data_path"] = data_path + "/fold_" + str(i + 1)
 
-    model = model(in_channels=3, num_classes=7).cuda()
-    model.load_state_dict(state["net"])
-    model.eval()
+        acc = 0.0
+        state = torch.load("./saved/checkpoints/{}".format(checkpoint_name))
 
-    correct = 0
-    total = 0
-    all_target = []
-    all_output = []
+        from models import basenet, densenet121, resnet18, resmasking_dropout1, resnet152, resnet50
 
-    if dataset_name == "fer2013":
-        test_set = fer2013("test", configs, tta=True, tta_size=10)
-        # test_set = fer2013('test', configs, tta=False, tta_size=0)
-    else:
-        test_set = mydataset("test", configs, tta=True, tta_size=10)
+        model = resnet50
 
-    print("Calc acc on private test with tta..")
-    with torch.no_grad():
-        for idx in tqdm(range(len(test_set)), total=len(test_set), leave=False):
-            images, targets = test_set[idx]
+        model = model(in_channels=3, num_classes=7).cuda()
+        model.load_state_dict(state["net"])
+        model.eval()
 
-            images = make_batch(images)
-            images = images.cuda(non_blocking=True)
+        correct = 0
+        total = 0
+        all_target = []
+        all_output = []
 
-            outputs = model(images).cpu()
-            outputs = F.softmax(outputs, 1)
+        if dataset_name == "fer2013":
+            test_set = fer2013("test", configs, tta=True, tta_size=10)
+            # test_set = fer2013('test', configs, tta=False, tta_size=0)
+        else:
+            test_set = mydataset("test", configs, tta=True, tta_size=10)
 
-            # outputs.shape [tta_size, 7]
-            outputs = torch.sum(outputs, 0)
-            outputs = torch.argmax(outputs, 0)
-            outputs = outputs.item()
-            targets = targets.item()
-            total += 1
-            correct += outputs == targets
+        print("Testing fold {} on private test with tta..".format(i + 1))
+        with torch.no_grad():
+            for idx in tqdm(range(len(test_set)), total=len(test_set), leave=False):
+                images, targets = test_set[idx]
 
-            all_target.append(targets)
-            all_output.append(outputs)
+                images = make_batch(images)
+                images = images.cuda(non_blocking=True)
 
-            # if len(np.unique(all_target)) == 7:
-            #     break
-            # if idx == 10:
-            #     break
+                outputs = model(images).cpu()
+                outputs = F.softmax(outputs, 1)
 
-    acc = 100. * correct / total
-    print("Accuracy on private test with tta: {:.3f}".format(acc))
-    out_path = "./saved/results/accuracy/{}.csv".format(checkpoint_name)
-    out_file = open(out_path, "w", newline='')
-    csv_writer = csv.writer(out_file, delimiter=",")
-    acc_row = [acc]
-    csv_writer.writerow(acc_row)
-    
-    all_target = np.array(all_target)
-    all_output = np.array(all_output)
+                # outputs.shape [tta_size, 7]
+                outputs = torch.sum(outputs, 0)
+                outputs = torch.argmax(outputs, 0)
+                outputs = outputs.item()
+                targets = targets.item()
+                total += 1
+                correct += outputs == targets
 
-    matrix = confusion_matrix(all_target, all_output)
-    np.set_printoptions(precision=2)
+                all_target.append(targets)
+                all_output.append(outputs)
 
-    # plt.figure(figsize=(5, 5))
-    plot_confusion_matrix(
-        matrix,
-        classes=class_names,
-        normalize=True,
-        # title='{} \n Accuracc: {:.03f}'.format(checkpoint_name, acc)
-        title="Resnet152",
-    )
+                # if len(np.unique(all_target)) == 7:
+                #     break
+                # if idx == 10:
+                #     break
 
-    class_report = classification_report(all_target, all_output, target_names=class_names)
-    print("Classification report")
-    print(class_report)
-    # plt.show()
-    # plt.savefig('cm_{}.png'.format(checkpoint_name))
-    #plt.savefig("./saved/cm/cm_{}.pdf".format(checkpoint_name))
-    #plt.close()
+        acc = 100. * correct / total
+        #print("Accuracy on private test with tta: {:.3f}".format(acc))
+
+        all_target = np.array(all_target)
+        all_output = np.array(all_output)
+
+        matrix = confusion_matrix(all_target, all_output)
+        np.set_printoptions(precision=2)
+
+        validated = "all_results"
+        log_name = check_test_name.format(validated)
+        Log("Test fold {}\n\n".format(i + 1), "./saved/results/{}.txt".format(log_name))
+
+        # plt.figure(figsize=(5, 5))
+        plot_confusion_matrix(
+            matrix,
+            classes=class_names,
+            normalize=True,
+            # title='{} \n Accuracc: {:.03f}'.format(checkpoint_name, acc)
+            title="Resnet50",
+            log_name=log_name,
+            check_log_name=check_log_name
+        )
+
+        class_report = classification_report(all_target, all_output, target_names=class_names)
+        print("Classification report")
+        print(class_report)
+        Log("\n\nClassification report\n", "./saved/results/{}.txt".format(log_name))
+        Log(class_report, "./saved/results/{}.txt".format(log_name))
+        Log("\n\n", "./saved/results/{}.txt".format(log_name))
+        # plt.show()
+        # plt.savefig('cm_{}.png'.format(checkpoint_name))
+        #plt.savefig("./saved/cm/cm_{}.pdf".format(checkpoint_name))
+        #plt.close()
 
 
 if __name__ == "__main__":
