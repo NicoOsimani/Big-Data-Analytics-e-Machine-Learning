@@ -438,7 +438,7 @@ class FER2013Trainer(Trainer):
         """check stop condition"""
         return (
             self._plateau_count > self._max_plateau_count
-            or self._current_epoch_num > self._max_epoch_num
+            or self._current_epoch_num > (self._max_epoch_num - 1)
         )
 
     def _increase_epoch_num(self):

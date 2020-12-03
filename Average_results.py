@@ -64,7 +64,7 @@ def plot_confusion_matrix(
     plt.xlabel("Predicted label", fontsize=12)
     plt.tight_layout()
     fig.savefig("./saved/cm/cm_{}.png".format(log_name))
-    plt.show()
+    #plt.show()
     plt.close(fig)
 
 def main():
