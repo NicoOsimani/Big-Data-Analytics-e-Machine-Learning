@@ -4,7 +4,7 @@ import numpy as np
 import itertools
 from prettytable import PrettyTable
 
-dataFile = "resmasking_dropout1__n_fold_all_results_2020Nov15_21.44.txt"
+dataFile = "resmasking_dropout1_fer2013_fold_all_results_train1_test1.txt"
 class_names = ["Angry", "Disgust", "Fear", "Happy", "Sad", "Surprise", "Neutral"]
 
 log_name_list = list(dataFile)
@@ -17,7 +17,6 @@ log_name = ""
 for x in log_name_list:
     log_name += x
 
-#log_name="provvisorio"
 def Log(data, name):
     file = open(name, "a")
     file.write(str(data))
@@ -100,16 +99,19 @@ def main():
     for i in range(0, len(average)):
         average[i] = round(average[i]/(k - 1), 2)
 
-    cm_rows = []
+    cm = np.array([[]])
     row = []
     k = 1
     for i in range(0, numbers):
         row.append(average[i])
         if (i + 1) == k * num_classes:
-            cm_rows.append(row)
+            if (i + 1) == num_classes:
+                cm = np.array([row])
+            else:
+                cm_rows = np.array([row])
+                cm = np.append(cm, cm_rows, 0)
             row = []
             k += 1
-    cm = np.array([cm_rows[0], cm_rows[1], cm_rows[2], cm_rows[3], cm_rows[4], cm_rows[5], cm_rows[6]])
     plot_confusion_matrix(
         cm,
         classes=class_names,
@@ -133,11 +135,5 @@ def main():
     Log(t, "./saved/results/{}.txt".format(log_name))
     Log("\n\n", "./saved/results/{}.txt".format(log_name))
 
-'''
-    print(len(allData))
-    print(len(allData[0]))
-    print(allData)
-    print(average)
-'''
 if __name__ == "__main__":
     main()

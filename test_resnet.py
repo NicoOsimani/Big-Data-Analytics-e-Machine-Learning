@@ -26,9 +26,9 @@ from matplotlib import rc
 #rc("text", usetex=True)
 
 # todo: set names
-check_name = "resnet50_fer2013_fold_{}_2020Nov15_21.44" #checkpoint names - resnet50_fer2013_fold_{}_2020Nov15_21.44
+check_name = "resnet50_fer2013_fold_{}_train1" #checkpoint names - mettere {} al posto del numero di fold
 dataset_name = "fer2013" #fer2013
-test_name = "test"
+test_name = "test1"
 class_names = ["Angry", "Disgust", "Fear", "Happy", "Sad", "Surprise", "Neutral"]
 
 seed = 1234

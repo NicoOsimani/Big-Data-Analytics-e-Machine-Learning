@@ -3,8 +3,9 @@ import json
 import random
 import warnings
 
-# todo: set dataset name
+# todo: set names
 dataset_name = "fer2013" #fer2013
+train_name = "train1"
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
 
@@ -60,7 +61,7 @@ def main(config_path):
         from trainers.tta_trainer import FER2013Trainer
 
         # from trainers.centerloss_trainer import FER2013Trainer
-        trainer = FER2013Trainer(model, train_set, val_set, test_set, configs)
+        trainer = FER2013Trainer(model, train_set, val_set, test_set, configs, train_name)
 
         if configs["distributed"] == 1:
             ngpus = torch.cuda.device_count()

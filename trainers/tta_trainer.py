@@ -43,7 +43,7 @@ class Trainer(object):
 class FER2013Trainer(Trainer):
     """for classification task"""
 
-    def __init__(self, model, train_set, val_set, test_set, configs):
+    def __init__(self, model, train_set, val_set, test_set, configs, train_name):
         super().__init__()
         print("Start trainer..")
         print(configs)
@@ -197,7 +197,7 @@ class FER2013Trainer(Trainer):
             "{}_{}_{}".format(
                 self._configs["arch"],
                 self._configs["model_name"],
-                self._start_time.strftime("%Y%b%d_%H.%M"),
+                train_name
             ),
         )
 
