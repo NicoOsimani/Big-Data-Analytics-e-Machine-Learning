@@ -19,7 +19,7 @@ EMOTION_DICT = {
 }
 
 
-class MYDATASET(Dataset):
+class VIDEO(Dataset):
     def __init__(self, stage, configs, tta=False, tta_size=48):
         self._stage = stage
         self._configs = configs
@@ -69,12 +69,12 @@ class MYDATASET(Dataset):
         return image, target
 
 
-def mydataset(stage, configs=None, tta=False, tta_size=48):
-    return MYDATASET(stage, configs, tta, tta_size)
+def video(stage, configs=None, tta=False, tta_size=48):
+    return video(stage, configs, tta, tta_size)
 
 
 if __name__ == "__main__":
-    data = MYDATASET(
+    data = VIDEO(
         "train",
         {
             "data_path": "/home/z/research/tee/saved/data/fer2013/",

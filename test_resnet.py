@@ -43,7 +43,7 @@ torch.backends.cudnn.benchmark = False
 
 from models import resatt18
 from utils.datasets.fer2013dataset import fer2013
-from utils.datasets.mydatasetdataset import mydataset
+from utils.datasets.videodataset import video
 from utils.generals import make_batch
 from tqdm import tqdm
 
@@ -138,7 +138,7 @@ def main():
             test_set = fer2013("test", configs, tta=True, tta_size=10)
             # test_set = fer2013('test', configs, tta=False, tta_size=0)
         else:
-            test_set = mydataset("test", configs, tta=True, tta_size=10)
+            test_set = video("test", configs, tta=True, tta_size=10)
 
         print("Testing fold {} on private test with tta..".format(i + 1))
         with torch.no_grad():

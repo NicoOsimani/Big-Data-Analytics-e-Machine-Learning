@@ -1,5 +1,5 @@
 {
-	"data_path": "saved/data/mydataset",
+	"data_path": "saved/data/video",
 	"image_size": 224,
 	"in_channels": 3,
 	"num_classes": 7,
@@ -18,6 +18,6 @@
 	"steplr": 50,
 	"log_dir": "saved/logs",
 	"checkpoint_dir": "saved/checkpoints",
-	"model_name": "mydataset",
+	"model_name": "video",
 	"k-fold": 10
 }

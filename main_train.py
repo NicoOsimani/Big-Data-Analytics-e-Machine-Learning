@@ -90,16 +90,16 @@ def get_dataset(configs):
     This function get raw dataset
     """
     from utils.datasets.fer2013dataset import fer2013
-    from utils.datasets.mydatasetdataset import mydataset
+    from utils.datasets.videodataset import video
 
     if dataset_name == "fer2013":
         train_set = fer2013("train", configs)
         val_set = fer2013("val", configs)
         test_set = fer2013("test", configs, tta=True, tta_size=10)
     else:
-        train_set = mydataset("train", configs)
-        val_set = mydataset("val", configs)
-        test_set = mydataset("test", configs, tta=True, tta_size=10)
+        train_set = video("train", configs)
+        val_set = video("val", configs)
+        test_set = video("test", configs, tta=True, tta_size=10)
     return train_set, val_set, test_set
 
 
@@ -107,4 +107,4 @@ if __name__ == "__main__":
     if dataset_name == "fer2013":
         main("./configs/fer2013_config.json")
     else:
-        main("./configs/mydataset_config.json")
+        main("./configs/video_config.json")
