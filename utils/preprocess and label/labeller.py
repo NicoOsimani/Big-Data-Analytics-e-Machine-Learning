@@ -7,7 +7,8 @@ from os import listdir
 from os.path import isfile, join
 
 in_folder_path = "/home/nico/Scrivania/Big data/Progetto/Big-Data-Analytics-e-Machine-Learning/saved/data/video"
-out_file_path = "/home/nico/Scrivania/Big data/Progetto/Big-Data-Analytics-e-Machine-Learning/saved/data/video/fold_1/test.csv"
+out_file_path = "/home/nico/Scrivania/Big data/Progetto/Big-Data-Analytics-e-Machine-Learning/saved/data/video/fold_1/test1.csv"
+label_since = 1
 
 labels = []
 
@@ -57,7 +58,8 @@ def main():
     files = [f for f in listdir(in_folder_path) if isfile(join(in_folder_path, f))]
     images_names = []
     for i in range(0, len(files)):
-        images_names.append(str(i + 1) + ".png")
+        images_names.append(str(i + label_since) + ".png")
+    print(images_names)
 
     for i in range(0, len(images_names)):
         image_path = in_folder_path + "/" + images_names[i]
