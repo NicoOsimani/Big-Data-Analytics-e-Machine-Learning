@@ -59,7 +59,6 @@ def main():
     images_names = []
     for i in range(0, len(files)):
         images_names.append(str(i + label_since) + ".png")
-    print(images_names)
 
     for i in range(0, len(images_names)):
         image_path = in_folder_path + "/" + images_names[i]
@@ -70,14 +69,14 @@ def main():
 
         # Load an image using OpenCV
         cv_img = cv2.cvtColor(cv2.imread(image_path), cv2.COLOR_BGR2RGB)
-        cv_img = cv2.resize(cv_img, (224, 224))
+        cv_img = cv2.resize(cv_img, (448, 448))
 
         # Get the image dimensions (OpenCV stores image data as NumPy ndarray)
         height, width, no_channels = cv_img.shape
 
         # Create a canvas that can fit the above image
         canvas = tkinter.Canvas(window, width = width, height = height)
-        canvas.pack()
+        canvas.grid(row=0, column=0, columnspan = 7)
 
         # Use PIL (Pillow) to convert the NumPy ndarray to a PhotoImage
         photo = PIL.ImageTk.PhotoImage(image = PIL.Image.fromarray(cv_img))
@@ -86,26 +85,27 @@ def main():
         canvas.create_image(0, 0, image=photo, anchor=tkinter.NW)
 
         # Buttons
-        btn_0 = tkinter.Button(window, text="Angry", width=50, command=lambda:[func_0(), window.destroy()])
-        btn_0.pack(anchor=tkinter.CENTER, expand=True)
+        btn_0 = tkinter.Button(window, text="Angry", width=4, command=lambda:[func_0(), window.destroy()])
 
-        btn_1 = tkinter.Button(window, text="Disgust", width=50, command=lambda:[func_1(), window.destroy()])
-        btn_1.pack(anchor=tkinter.CENTER, expand=True)
+        btn_1 = tkinter.Button(window, text="Disgust", width=4, command=lambda:[func_1(), window.destroy()])
 
-        btn_2 = tkinter.Button(window, text="Fear", width=50, command=lambda:[func_2(), window.destroy()])
-        btn_2.pack(anchor=tkinter.CENTER, expand=True)
+        btn_2 = tkinter.Button(window, text="Fear", width=4, command=lambda:[func_2(), window.destroy()])
 
-        btn_3 = tkinter.Button(window, text="Happy", width=50, command=lambda:[func_3(), window.destroy()])
-        btn_3.pack(anchor=tkinter.CENTER, expand=True)
+        btn_3 = tkinter.Button(window, text="Happy", width=4, command=lambda:[func_3(), window.destroy()])
 
-        btn_4 = tkinter.Button(window, text="Sad", width=50, command=lambda:[func_4(), window.destroy()])
-        btn_4.pack(anchor=tkinter.CENTER, expand=True)
+        btn_4 = tkinter.Button(window, text="Sad", width=4, command=lambda:[func_4(), window.destroy()])
 
-        btn_5 = tkinter.Button(window, text="Surprise", width=50, command=lambda:[func_5(), window.destroy()])
-        btn_5.pack(anchor=tkinter.CENTER, expand=True)
+        btn_5 = tkinter.Button(window, text="Surprise", width=4, command=lambda:[func_5(), window.destroy()])
 
-        btn_6 = tkinter.Button(window, text="Neutral", width=50, command=lambda:[func_6(), window.destroy()])
-        btn_6.pack(anchor=tkinter.CENTER, expand=True)
+        btn_6 = tkinter.Button(window, text="Neutral", width=4, command=lambda:[func_6(), window.destroy()])
+
+        btn_0.grid(row=1, column=0)
+        btn_1.grid(row=1, column=1)
+        btn_2.grid(row=1, column=2)
+        btn_3.grid(row=1, column=3)
+        btn_4.grid(row=1, column=4)
+        btn_5.grid(row=1, column=5)
+        btn_6.grid(row=1, column=6)
 
         # Run the window loop
         window.mainloop()
