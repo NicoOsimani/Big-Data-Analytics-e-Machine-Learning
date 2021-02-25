@@ -5,6 +5,7 @@ import itertools
 from prettytable import PrettyTable
 
 dataFile = "resmasking_dropout1_fer2013_fold_all_results_train1_test1.txt"
+
 class_names = ["Angry", "Disgust", "Fear", "Happy", "Sad", "Surprise", "Neutral"]
 
 log_name_list = list(dataFile)

@@ -1,7 +1,7 @@
 import csv
 
-folder_path = "/home/nico/Scrivania/Big data/Progetto/csv/fold_1/" #path alla cartella
-file_names = ["train_val", "train", "val", "test"]
+folder_path = "/home/nico/Scrivania/Big data/Progetto/Big-Data-Analytics-e-Machine-Learning/saved/data/video/fold_1/" #path alla cartella
+file_names = ["test"]
 
 for i in range(0, len(file_names)):
     count_0 = 0

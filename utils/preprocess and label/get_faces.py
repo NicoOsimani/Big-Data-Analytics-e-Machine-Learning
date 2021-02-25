@@ -1,8 +1,8 @@
 import cv2
 
-video_path = "/home/nico/Scrivania/Big data/Progetto/data/videoprova.mp4"
-out_folder_path = "/home/nico/Scrivania/Big data/Progetto/Big-Data-Analytics-e-Machine-Learning/saved/data/video/"
-classifier_path = "/home/nico/Scrivania/Big data/Progetto/data/haarcascade_frontalface_alt_tree.xml" # questo va bene haarcascade_frontalface_alt_tree.xml
+video_path = "/home/nico/Scrivania/Big data/Progetto/Big-Data-Analytics-e-Machine-Learning/saved/data/pre-processed/videos/Looney Tunes in italiano Introduzioni Vol. 1 WB Kids.mp4"
+out_folder_path = "/home/nico/Scrivania/Big data/Progetto/Big-Data-Analytics-e-Machine-Learning/saved/data/pre-processed/photos/"
+classifier_path = "/home/nico/Scrivania/Big data/Progetto/Big-Data-Analytics-e-Machine-Learning/saved/data/pre-processed/haarcascade_frontalface_alt_tree.xml" # questo va bene haarcascade_frontalface_alt_tree.xml
 outputDim = (224, 224)
 frameRate = 1
 

@@ -4,6 +4,8 @@ import json
 import random
 import itertools
 
+from prettytable import PrettyTable
+import pandas as pd
 import imgaug
 import cv2
 import numpy as np
@@ -18,17 +20,22 @@ from torchvision.transforms import transforms
 
 # for consistent latex font
 from matplotlib import rc
+from matplotlib import rcParams
 
 # rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 ## for Palatino and other serif fonts use:
 # rc('font',**{'family':'serif','serif':['Palatino']})
-#rc("font", **{"family": "serif", "serif": ["Computer Modern Roman"]})
+# rc('font',**{'family':'serif','serif':['Computer Modern Roman']})
+#rcParams["font.family"] = "sans-serif"
+#rcParams["font.sans-serif"] = ["Computer Modern Sans"]
 #rc("text", usetex=True)
 
 # todo: set names
-check_name = "resnet50_fer2013_fold_{}_train1" #checkpoint names - mettere {} al posto del numero di fold
-dataset_name = "fer2013" #fer2013
+check_name = "resnet50_fer2013_fold_{}_train1" #checkpoint names - mettere {} al posto del numero di fold se best_checkpoint_selection è 0
+best_checkpoint_selection = 0 #0, 1
+dataset_name = "fer2013" #fer2013, video
 test_name = "test1"
+
 class_names = ["Angry", "Disgust", "Fear", "Happy", "Sad", "Surprise", "Neutral"]
 
 seed = 1234
@@ -112,11 +119,18 @@ def main():
     data_path = configs["data_path"]
 
     for i in range(0, configs["k-fold"]):
-        checkpoint_name = check_name.format(i + 1)
+        if best_checkpoint_selection == 1 and configs["k-fold"] == 1:
+            checkpoint_name = check_name
+        else:
+            checkpoint_name = check_name.format(i + 1)
 
         check_log_name = checkpoint_name + "_" + test_name
 
         configs["data_path"] = data_path + "/fold_" + str(i + 1)
+
+        if dataset_name == "video":
+            data_vectors = pd.read_csv(os.path.join(configs["data_path"], "test.csv"))
+            image_name_vector = data_vectors["image_name"].tolist()
 
         acc = 0.0
         state = torch.load("./saved/checkpoints/{}".format(checkpoint_name))
@@ -140,7 +154,11 @@ def main():
         else:
             test_set = video("test", configs, tta=True, tta_size=10)
 
-        print("Testing fold {} on private test with tta..".format(i + 1))
+        if best_checkpoint_selection == 1 and configs["k-fold"] == 1:
+            print("Testing on private test with tta..".format(i + 1))
+        else:
+            print("Testing fold {} on private test with tta..".format(i + 1))
+
         with torch.no_grad():
             for idx in tqdm(range(len(test_set)), total=len(test_set), leave=False):
                 images, targets = test_set[idx]
@@ -176,9 +194,15 @@ def main():
         matrix = confusion_matrix(all_target, all_output)
         np.set_printoptions(precision=2)
 
-        validated = "all_results"
+        if best_checkpoint_selection == 1 and configs["k-fold"] == 1:
+            validated = "1"
+        else:
+            validated = "all_results"
+
         log_name = check_test_name.format(validated)
-        Log("Test fold {}\n\n".format(i + 1), "./saved/results/{}.txt".format(log_name))
+
+        if not best_checkpoint_selection == 1 and configs["k-fold"] == 1:
+            Log("Test fold {}\n\n".format(i + 1), "./saved/results/{}.txt".format(log_name))
 
         # plt.figure(figsize=(5, 5))
         plot_confusion_matrix(
@@ -197,10 +221,29 @@ def main():
         Log("\n\nClassification report\n", "./saved/results/{}.txt".format(log_name))
         Log(class_report, "./saved/results/{}.txt".format(log_name))
         Log("\n\n", "./saved/results/{}.txt".format(log_name))
+
+        if dataset_name == "video":
+            t_image_name_vector = ["Image names"]
+            t_all_target = ["true"]
+            t_all_output = ["predicted"]
+            for j in range(0, len(image_name_vector)):
+                t_image_name_vector.append(image_name_vector[j])
+                t_all_target.append(str(all_target[j]))
+                t_all_output.append(str(all_output[j]))
+            t = PrettyTable(t_image_name_vector)
+            t.add_row(t_all_target)
+            t.add_row(t_all_output)
+            print("Image predictions")
+            print(t)
+            Log("Image predictions\n", "./saved/results/{}.txt".format(log_name))
+            Log(t, "./saved/results/{}.txt".format(log_name))
+            Log("\n\n", "./saved/results/{}.txt".format(log_name))
+
         # plt.show()
         # plt.savefig('cm_{}.png'.format(checkpoint_name))
         #plt.savefig("./saved/cm/cm_{}.pdf".format(checkpoint_name))
         #plt.close()
+        #print("save at ./saved/cm/cm_{}.pdf".format(checkpoint_name))
 
 
 if __name__ == "__main__":

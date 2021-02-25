@@ -70,7 +70,7 @@ class VIDEO(Dataset):
 
 
 def video(stage, configs=None, tta=False, tta_size=48):
-    return video(stage, configs, tta, tta_size)
+    return VIDEO(stage, configs, tta, tta_size)
 
 
 if __name__ == "__main__":
