@@ -4,7 +4,10 @@ import numpy as np
 import itertools
 from prettytable import PrettyTable
 
+# todo: set names
 dataFile = "resmasking_dropout1_fer2013_fold_all_results_train1_test1.txt"
+cm_name = "Residual Masking Network"
+cm_normalization = True #True, False
 
 class_names = ["Angry", "Disgust", "Fear", "Happy", "Sad", "Surprise", "Neutral"]
 
@@ -36,6 +39,7 @@ def plot_confusion_matrix(
         print("Normalized confusion matrix")
     else:
         print("Confusion matrix, without normalization")
+        cm = cm.astype("float")
     for i in range(0,len(cm)):
         for j in range(0, len(cm[0])):
             cm[i][j] = round(cm[i][j], 2)
@@ -50,7 +54,7 @@ def plot_confusion_matrix(
     plt.xticks(tick_marks, classes, rotation=45)
     plt.yticks(tick_marks, classes)
 
-    fmt = ".2f" if normalize else "d"
+    fmt = ".2f" #if normalize else "d"
     thresh = cm.max() / 2.0
     for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
         plt.text(
@@ -72,26 +76,46 @@ def main():
     num_classes = len(class_names)
     numbers = num_classes*num_classes
     dataPath = "./saved/results/" + dataFile
-    exp = "\d+\.\d+"
+    if cm_normalization:
+        exp = "\d+\.\d+"
+    else:
+        exp = r'\d+'
     foldData = []
     allData = []
     z = 0
     k = 1
-    with open(dataPath) as f:
-        lines = f.readlines()
-        for i, line in enumerate(lines):
-            for s in re.findall(exp, line):
-                foldData.append(float(s))
-                z += 1
-                if z == k * (numbers + num_classes*4):
-                    z == 0
-                    allData.append(foldData)
-                    foldData = []
-                    k += 1
+    if cm_normalization:
+        with open(dataPath) as f:
+            lines = f.readlines()
+            for i, line in enumerate(lines):
+                for s in re.findall(exp, line):
+                    foldData.append(float(s))
+                    z += 1
+                    if z == k * (numbers + num_classes*4):
+                        z == 0
+                        allData.append(foldData)
+                        foldData = []
+                        k += 1
 
-    average = []
-    for i in range(0, numbers + num_classes*4):
-        average.append(0)
+        average = []
+        for i in range(0, numbers + num_classes*4):
+            average.append(0)
+    else:
+        with open(dataPath) as f:
+            lines = f.readlines()
+            for i, line in enumerate(lines):
+                for s in re.findall(exp, line):
+                    foldData.append(int(s))
+                    z += 1
+                    if z == k * (numbers + num_classes*7 + 18):
+                        z == 0
+                        allData.append(foldData)
+                        foldData = []
+                        k += 1
+        
+        average = []
+        for i in range(0, numbers + num_classes*7 + 18):
+            average.append(0)
 
     for i in range(0, len(allData)):
         for j in range(0, len(allData[0])):
@@ -113,28 +137,30 @@ def main():
                 cm = np.append(cm, cm_rows, 0)
             row = []
             k += 1
+
     plot_confusion_matrix(
         cm,
         classes=class_names,
-        normalize=True,
-        title="Residual Masking Network"
+        normalize=cm_normalization,
+        title=cm_name
     )
 
-    t = PrettyTable(['', 'precision', 'recall', 'f1-score'])
-    j = 0
-    for i in range(numbers, len(average) - 7 - 2 * num_classes):
-        t.add_row([class_names[j], average[3 * (i - numbers) + numbers], average[3 * (i - numbers) + numbers + 1], average[3 * (i - numbers) + numbers + 2]])
-        j += 1
+    if cm_normalization:
+        t = PrettyTable(['', 'precision', 'recall', 'f1-score'])
+        j = 0
+        for i in range(numbers, len(average) - 7 - 2 * num_classes):
+            t.add_row([class_names[j], average[3 * (i - numbers) + numbers], average[3 * (i - numbers) + numbers + 1], average[3 * (i - numbers) + numbers + 2]])
+            j += 1
 
-    t.add_row(['------------', '---------', '---------', '---------'])
-    t.add_row(['accuracy', '', '', average[len(average) - 7]])
-    t.add_row(['macro avg', average[len(average) - 6], average[len(average) - 5], average[len(average) - 4]])
-    t.add_row(['weighted avg', average[len(average) - 3], average[len(average) - 2], average[len(average) - 1]])
-    print("Classification report")
-    print(t)
-    Log("\n\nClassification report\n", "./saved/results/{}.txt".format(log_name))
-    Log(t, "./saved/results/{}.txt".format(log_name))
-    Log("\n\n", "./saved/results/{}.txt".format(log_name))
+        t.add_row(['------------', '---------', '---------', '---------'])
+        t.add_row(['accuracy', '', '', average[len(average) - 7]])
+        t.add_row(['macro avg', average[len(average) - 6], average[len(average) - 5], average[len(average) - 4]])
+        t.add_row(['weighted avg', average[len(average) - 3], average[len(average) - 2], average[len(average) - 1]])
+        print("Classification report")
+        print(t)
+        Log("\n\nClassification report\n", "./saved/results/{}.txt".format(log_name))
+        Log(t, "./saved/results/{}.txt".format(log_name))
+        Log("\n\n", "./saved/results/{}.txt".format(log_name))
 
 if __name__ == "__main__":
     main()

@@ -35,6 +35,7 @@ check_name = "resnet50_fer2013_fold_{}_train1" #checkpoint names - mettere {} al
 best_checkpoint_selection = 0 #0, 1
 dataset_name = "fer2013" #fer2013, video
 test_name = "test1"
+cm_normalization = True #True, False
 
 class_names = ["Angry", "Disgust", "Fear", "Happy", "Sad", "Surprise", "Neutral"]
 
@@ -201,14 +202,14 @@ def main():
 
         log_name = check_test_name.format(validated)
 
-        if not best_checkpoint_selection == 1 and configs["k-fold"] == 1:
+        if not best_checkpoint_selection == 1 and configs["k-fold"] != 1 and cm_normalization == True:
             Log("Test fold {}\n\n".format(i + 1), "./saved/results/{}.txt".format(log_name))
 
         # plt.figure(figsize=(5, 5))
         plot_confusion_matrix(
             matrix,
             classes=class_names,
-            normalize=True,
+            normalize=cm_normalization,
             # title='{} \n Accuracc: {:.03f}'.format(checkpoint_name, acc)
             title="Resnet50",
             log_name=log_name,
@@ -222,7 +223,7 @@ def main():
         Log(class_report, "./saved/results/{}.txt".format(log_name))
         Log("\n\n", "./saved/results/{}.txt".format(log_name))
 
-        if dataset_name == "video":
+        if dataset_name == "video" and best_checkpoint_selection == 1:
             t_image_name_vector = ["Image names"]
             t_all_target = ["true"]
             t_all_output = ["predicted"]
