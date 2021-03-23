@@ -37,5 +37,5 @@ Se si è utilizzata la k-fold cross validation, si deve eseguire un ulteriore st
 ## 3. Altre funzionalità:
 
 Il repository contiene inoltre nella cartella utils/csv_manager/ degli script che permettono la suddivisone del dataset in set di test, train, e validation applicando una sampling stratification, per generare k-fold che rispettino la distribuzione originale delle classi.
-Infine nella cartella utils/preprocess and label/ sono presenti degli script che consentono di estrarre volti da frame video e di labellarli, per creare un dataset di immagini personalizzato.
+Infine nella cartella utils/preprocess and label/ sono presenti degli script che consentono di estrarre volti da frame video, applicando il cascade filter di OpenCV e di labellarli, per creare un dataset di immagini personalizzato.
 
